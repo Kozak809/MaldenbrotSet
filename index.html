@@ -1,0 +1,85 @@
+<!Doctupe html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Maldenbrot Set</title>
+<script src="https://unpkg.com/brain.js"></script>
+</head>
+<body>
+<h2 style="text-align:center;">Press Space</h2>
+<div align="center" id="mandelbrotDiv"></div>
+<script type="text/javascript">
+ var p;
+ var res = 0;
+ var per = 0;
+function mandelbrotIteration (cx, cy, maxIter) {
+ var x = 0.0;
+ var y = 0.0;
+ var xx = 0;
+ var yy = 0;
+ var xy = 0;
+ var i = maxIter;
+ while (i-- && xx + yy <= 4) {
+  xy = x * y;
+  xx = x * x;
+  yy = y * y;
+  x = xx - yy + cx;
+  y = xy + xy + cy;
+ }
+ return maxIter - i;
+}
+document.onkeydown = function push(p){if (p.keyCode == '32') {
+function mandelbrot (canvas, xmin, xmax, ymin, ymax, iterations) {
+ var width = canvas.width;
+ var height = canvas.height;
+ var context = canvas.getContext('2d');
+ var image = context.getImageData(0, 0, width, height);
+ var pixels = image.data;
+
+ for (var ix = 0; ix < width; ++ix) {
+  for (var iy = 0; iy < height; ++iy) {
+   var x = xmin + (xmax - xmin) * ix / (width - 1);
+   var y = ymin + (ymax - ymin) * iy / (height - 1);
+   var i = mandelbrotIteration(x, y, iterations);
+   var pixels_position = 4 * (width * iy + ix);
+   if (i > iterations) {
+    pixels[pixels_position] = 0;
+    pixels[pixels_position + 1] = 0;
+    pixels[pixels_position + 2] = 0;
+   } 
+   else {
+    var color = 3 * Math.log(i) / Math.log(iterations - 1.0);
+    if (color < 1) {
+     pixels[pixels_position] = 255 * color;
+     pixels[pixels_position + 1] = 0;
+     pixels[pixels_position + 2] = 0;
+    }
+    else if ( color < 2 ) {
+     pixels[pixels_position] = 255;
+     pixels[pixels_position + 1] = 255 * (color - 1);
+     pixels[pixels_position + 2] = 0;
+    } 
+    else {
+     pixels[pixels_position] = 255;
+     pixels[pixels_position + 1] = 255;
+     pixels[pixels_position + 2] = 255 * (color - 2);
+    }
+   }
+   pixels[pixels_position + 3] = 255;
+  }
+ }
+ context.putImageData(image, 0, 0);
+}
+ 
+var canvas = document.createElement('canvas');
+canvas.width = 1000;
+canvas.height = 1000;
+var node=document.getElementById('mandelbrotDiv');
+node.appendChild(canvas);
+ 
+mandelbrot(canvas, -2.1, 2.1, -2.1, 2.1, 2000);
+}};
+</script>
+<noscript><div>Извините, требуется включённый Javascript для работы приложения!</div></noscript>
+</body>
+</html>
